@@ -1,0 +1,15 @@
+# Virtual Environment
+/venv/
+
+# Environment variables
+.env
+
+# Python cache files
+__pycache__/
+*.pyc
+
+# Output folders
+/pdf_output/
+
+# VS Code specific
+.vscode/

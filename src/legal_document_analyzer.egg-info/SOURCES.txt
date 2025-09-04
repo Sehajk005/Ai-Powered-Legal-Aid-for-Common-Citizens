@@ -1,0 +1,8 @@
+pyproject.toml
+src/legal_document_analyzer.egg-info/PKG-INFO
+src/legal_document_analyzer.egg-info/SOURCES.txt
+src/legal_document_analyzer.egg-info/dependency_links.txt
+src/legal_document_analyzer.egg-info/top_level.txt
+src/ocr_processing/__init__.py
+src/ocr_processing/image_to_text.py
+tests/test_image_to_text.py
