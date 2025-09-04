@@ -1,3 +1,9 @@
+import sys
+import os
+
+# Add the project's root directory to the Python path
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
+
 from src.pipeline import process_pdf_for_text
 from src.information_extraction.extractor import extract_entities_with_llm
 from src.information_extraction.extractor import answer_user_questions
