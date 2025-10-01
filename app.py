@@ -11,12 +11,11 @@ import tempfile
 import json
 import re
 import streamlit as st 
-from streamlit_gsheets import GSheetsConnection
 import pandas as pd
 from datetime import datetime
 
 # Establish a connection to Google Sheets
-conn = st.connection("gsheets", type=GSheetsConnection)
+conn = st.connection("gsheets", type="gsheets")
 def log_feedback(question, answer, rating, comment=""):
     # Create a new row of data as a DataFrame
     new_feedback = pd.DataFrame({
@@ -117,16 +116,30 @@ if st.session_state.get('analysis_complete'):
                 
                 # create colunm for feedback button
                 col1, col2, col3 = st.columns([1, 1, 8])
+                current_key_base = len(st.session_state.message_history)
                 
                 with col1:
-                    if st.button("👍", key=f"good_{len(st.session_state.message_history)}"):
+                    if st.button("👍", key=f"good_{current_key_base}"):
                         log_feedback(question=prompt, answer=response, rating="good")
                         st.toast("Thanks for your feedback!")
-                        
+                
                 with col2:
-                    if st.button("👎", key=f"bad_{len(st.session_state.message_history)}"):
-                        log_feedback(question=prompt, answer=response, rating="bad")
-                        st.toast("Thanks for your feedback!")
+                    if st.button("👎", key=f"bad_{current_key_base}"):
+                        # Set a flag in session state to show the comment box
+                        st.session_state[f"show_comment_for_{current_key_base}"] = True
+                
+                # Conditionally show a text area and submit button for comments
+                if st.session_state.get(f"show_comment_for_{current_key_base}"):
+                    comment = st.text_area(
+                        "Please provide more details:", 
+                        key=f"comment_{current_key_base}"
+                    )
+                    if st.button("Submit Feedback", key=f"submit_{current_key_base}"):
+                        log_feedback(question=prompt, answer=response, rating="bad", comment=comment)
+                        st.toast("Thanks for your detailed feedback!")
+                        # Hide the comment box after submission
+                        st.session_state[f"show_comment_for_{current_key_base}"] = False
+                        st.rerun() # Rerun to reflect the change immediately
                 
             # 4. add assistant response to chat history
             st.session_state.message_history.append({"role": "assistant", "content": response})
