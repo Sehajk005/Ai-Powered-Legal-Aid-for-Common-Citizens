@@ -11,6 +11,24 @@ import tempfile
 import json
 import re
 import streamlit as st 
+from streamlit_gsheets import GSheetsConnection
+import pandas as pd
+from datetime import datetime
+
+# Establish a connection to Google Sheets
+conn = st.connection("gsheets", type=GSheetsConnection)
+def log_feedback(question, answer, rating, comment=""):
+    # Create a new row of data as a DataFrame
+    new_feedback = pd.DataFrame({
+        "timestamp": [datetime.now()],
+        "question": [question],
+        "answer": [answer],
+        "rating": [rating],
+        "comment": [comment]
+    })
+    # Append the new row to the Google Sheet
+    conn.update(worksheet="Feedback", data=new_feedback)
+    
 
 if 'message_history' not in st.session_state:
     st.session_state.message_history = []
@@ -33,7 +51,6 @@ if upload_file is not None:
                 if start_index != -1 and end_index != 0:
                     json_data = llm_output[start_index:end_index]
                     data = json.loads(json_data)
-                    st.code(data, language='json')
                     # Store the data in the Streamlit session
                     st.session_state.document_text = text
                     st.session_state.llm_output = json_data
@@ -46,6 +63,7 @@ if upload_file is not None:
                 st.error(f"Error decoding JSON: {e}")
                 st.code(llm_output, language='text') # display the raw LLM output
                 data = {} # create an empty dictionary to avoid errors
+                
 if st.session_state.get('analysis_complete'):
     st.subheader("------Analysis Report------\n")
     
@@ -97,6 +115,19 @@ if st.session_state.get('analysis_complete'):
                 response = answer_user_questions(doc_text, prompt)
                 st.markdown(response)
                 
-        # 4. add assistant response to chat history
-        st.session_state.message_history.append({"role": "assistant", "content": response})
+                # create colunm for feedback button
+                col1, col2, col3 = st.columns([1, 1, 8])
+                
+                with col1:
+                    if st.button("👍", key=f"good_{len(st.session_state.message_history)}"):
+                        log_feedback(question=prompt, answer=response, rating="good")
+                        st.toast("Thanks for your feedback!")
+                        
+                with col2:
+                    if st.button("👎", key=f"bad_{len(st.session_state.message_history)}"):
+                        log_feedback(question=prompt, answer=response, rating="bad")
+                        st.toast("Thanks for your feedback!")
+                
+            # 4. add assistant response to chat history
+            st.session_state.message_history.append({"role": "assistant", "content": response})
         
