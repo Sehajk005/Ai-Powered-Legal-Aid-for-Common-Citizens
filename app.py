@@ -111,7 +111,7 @@ if st.session_state.get('analysis_complete'):
     st.subheader("------Analysis Report------\n")
     
     # Add this line back for debugging
-    st.json(st.session_state.analysis_data)
+    # st.json(st.session_state.analysis_data)
     # --- USAGE ---
     report_data = st.session_state.analysis_data
     
@@ -146,73 +146,72 @@ if st.session_state.get('analysis_complete'):
             st.write(clause.get('clause_text', 'N/A'))
     
     st.header("Ask questions regarding any queries from the document:")
-    # display the chat history
-    for message in st.session_state.message_history:
+
+    # 1. Display the entire chat history on every rerun
+    for index, message in enumerate(st.session_state.message_history):
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
-    # Get new user input using st.chat_input
-    # The walrus operator (:=) assigns the input to prompt and checks if it's not None in one go
-    if prompt := st.chat_input("Ask a question"):
-        # 1. add user message to chat history
-        st.session_state.message_history.append({"role": "user", "content": prompt})
-        # 2. Display user message in chat
-        with st.chat_message("user"):
-            st.markdown(prompt)
-        # 3. get the assistant response
-        with st.chat_message("assistant"):
-            with st.spinner("Thinking..."):
-                # 1. Get the original text from session state
-                original_text = st.session_state.document_text
-
-                # 2. Get the analysis data from session state
-                analysis_data = st.session_state.analysis_data
-                # Convert the analysis dictionary to a nicely formatted string
-                analysis_summary_str = json.dumps(analysis_data, indent=2)
-
-                # 3. Combine them into a single, rich context
-                full_context = f"""
-                    --- ORIGINAL DOCUMENT TEXT ---
-                    {original_text}
-                    --- END OF ORIGINAL DOCUMENT TEXT ---
-
-                    --- DETAILED ANALYSIS OF THE DOCUMENT ---
-                    Here is a pre-generated analysis of the document, including extracted entities and clauses with summaries and potential risks:
-                    {analysis_summary_str}
-                    --- END OF DETAILED ANALYSIS ---
-                    """
-                # 4. Pass the new full_context to the Q&A function
-                response = answer_user_questions(full_context, prompt)
-                
-                # 4. add assistant response to chat history
-                st.session_state.message_history.append({"role": "assistant", "content": response})
-                # 5. Display assistant response in chat
-                st.markdown(response)
-                
-                # create colunm for feedback button
-                col1, col2, col3 = st.columns([1, 1, 8])
-                current_key_base = len(st.session_state.message_history)
-
+            
+            # Add feedback buttons ONLY to assistant messages
+            if message["role"] == "assistant":
+                # Find the user question that corresponds to this answer
+                question_for_feedback = ""
+                if index > 0 and st.session_state.message_history[index - 1]["role"] == "user":
+                    question_for_feedback = st.session_state.message_history[index - 1]["content"]
+    
+                col1, col2, _ = st.columns([1, 1, 8])
                 with col1:
-                    if st.button("👍", key=f"good_{current_key_base}"):
-                        log_feedback(question=prompt, answer=response, rating="good")
-                        st.toast("Thanks for your feedback!")
-
+                    if st.button("👍", key=f"good_{index}"):
+                        try:
+                            log_feedback(question=question_for_feedback, answer=message["content"], rating="good")
+                            st.toast("Thanks for your feedback!")
+                        except Exception as e:
+                            st.error("An error occurred while logging feedback:")
+                            st.exception(e)
+                
                 with col2:
-                    if st.button("👎", key=f"bad_{current_key_base}"):
-                        # Set a flag in session state to show the comment box
-                        st.session_state[f"show_comment_for_{current_key_base}"] = True
-
-                # Conditionally show a text area and submit button for comments
-                if st.session_state.get(f"show_comment_for_{current_key_base}"):
+                    if st.button("👎", key=f"bad_{index}"):
+                        # You can add the detailed feedback logic here if needed
+                        st.session_state[f"show_comment_for_{index}"] = True
+    
+    
+                # Logic for the detailed feedback text area
+                if st.session_state.get(f"show_comment_for_{index}"):
                     comment = st.text_area(
                         "Please provide more details:", 
-                        key=f"comment_{current_key_base}"
+                        key=f"comment_{index}"
                     )
-                    if st.button("Submit Feedback", key=f"submit_{current_key_base}"):
-                        log_feedback(question=prompt, answer=response, rating="bad", comment=comment)
-                        st.toast("Thanks for your detailed feedback!")
-                        # Hide the comment box after submission
-                        st.session_state[f"show_comment_for_{current_key_base}"] = False
-                        st.rerun() # Rerun to reflect the change immediately
+                    if st.button("Submit Feedback", key=f"submit_{index}"):
+                        try:
+                            log_feedback(question=question_for_feedback, answer=message["content"], rating="bad", comment=comment)
+                            st.toast("Thanks for your detailed feedback!")
+                            st.session_state[f"show_comment_for_{index}"] = False
+                            st.rerun()
+                        except Exception as e:
+                            st.error("An error occurred while logging feedback:")
+                            st.exception(e)
+    
+    # 2. Get new user input
+    if prompt := st.chat_input("Ask a question"):
+        # Add user message to history
+        st.session_state.message_history.append({"role": "user", "content": prompt})
+    
+        # Display user message
+        with st.chat_message("user"):
+            st.markdown(prompt)
+    
+        # Generate and display assistant response
+        with st.chat_message("assistant"):
+            with st.spinner("Thinking..."):
+                # This is the same logic as before to get the full context
+                original_text = st.session_state.document_text
+                analysis_data = st.session_state.analysis_data
+                analysis_summary_str = json.dumps(analysis_data, indent=2)
+                full_context = f"""--- ORIGINAL DOCUMENT TEXT ---\n{original_text}\n--- END OF ORIGINAL DOCUMENT TEXT ---\n\n--- DETAILED ANALYSIS OF THE DOCUMENT ---\n{analysis_summary_str}\n--- END OF DETAILED ANALYSIS ---"""
                 
-        
+                response = answer_user_questions(full_context, prompt)
+                
+                # Add assistant response to history
+                st.session_state.message_history.append({"role": "assistant", "content": response})
+                # This will be displayed in the next rerun
+                st.rerun()
