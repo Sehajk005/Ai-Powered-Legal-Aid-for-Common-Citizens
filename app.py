@@ -55,26 +55,32 @@ if upload_file is not None:
             text = process_pdf_for_text(tem_file_path)
     
             llm_output = extract_entities_with_llm(text)
+            data = {}
+            json_data = ""
             try:
-                # Use regex to find the JSON block, allowing for ```json or just ```
+                # First, try to load the entire string as JSON. This handles the new clean output.
+                data = json.loads(llm_output)
+                json_data = llm_output
+            except json.JSONDecodeError:
+                # If that fails, fall back to searching for a markdown block.
                 match = re.search(r'```(json)?\s*(\{.*\}|\[.*\])\s*```', llm_output, re.DOTALL)
-                
                 if match:
-                    json_data = match.group(2) # Group 2 captures the content inside the backticks
-                    data = json.loads(json_data)
-                    # Store the data in the Streamlit session
-                    st.session_state.document_text = text
-                    st.session_state.llm_output = json_data
-                    st.session_state.analysis_data = data
-                    st.session_state.analysis_complete = True
+                    json_data = match.group(2)
+                    try:
+                        data = json.loads(json_data)
+                    except json.JSONDecodeError as e:
+                        st.error(f"Found a JSON block, but it's invalid: {e}")
+                        st.code(llm_output, language='text')
                 else:
-                    st.error("Could not find a valid JSON object in the LLM's response.")
+                    st.error("Could not parse the LLM's response as JSON.")
                     st.code(llm_output, language='text')
-                    data = {} # set data to an empty dictionary to avoid errors
-            except json.JSONDecodeError as e:
-                st.error(f"Error decoding JSON: {e}")
-                st.code(llm_output, language='text') # display the raw LLM output
-                data = {} # create an empty dictionary to avoid errors
+
+            if data:
+                # Store the data in the Streamlit session
+                st.session_state.document_text = text
+                st.session_state.llm_output = json_data
+                st.session_state.analysis_data = data
+                st.session_state.analysis_complete = True
                 
 if st.session_state.get('analysis_complete'):
     st.subheader("------Analysis Report------\n")
