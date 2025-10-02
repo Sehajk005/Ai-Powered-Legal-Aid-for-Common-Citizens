@@ -1,3 +1,6 @@
+import sys
+import os
+#############
 import google.generativeai as genai
 import pkg_resources
 
@@ -17,10 +20,8 @@ try:
         print(" -", m.name, "→", m.supported_generation_methods)
 except Exception as e:
     print("⚠️ Could not list models:", e)
+##########################################
 
-
-import sys
-import os
 
 # Add the project's root directory to the Python path
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
