@@ -32,7 +32,7 @@ def extract_entities_with_llm(text):
         4. 'summary_in_plain_english': Summarize the clause in plain English so that a non-legal person can understand the clause.
         5. 'potential_risks': assess the potential risks for the citizen and provide a short summary of the potential risks.
         6. Analyze the entire document and return the result as a JSON array of all the clauses you can identify.\
-            IMPORTANT: Your final output must be ONLY the raw JSON content. Do not include any other text, explanations, or markdown formatting like ```json before or after the JSON object.
+        Your final output must be ONLY the raw JSON content. Do not include any other text, explanations, or markdown formatting like ```json before or after the JSON object.
         Here is the document: {text}"""
     response = model.generate_content(full_prompt)
     return response.text
