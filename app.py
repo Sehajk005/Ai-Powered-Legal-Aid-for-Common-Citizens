@@ -56,10 +56,11 @@ if upload_file is not None:
     
             llm_output = extract_entities_with_llm(text)
             try:
-                start_index = llm_output.find("{")
-                end_index = llm_output.rfind("}") + 1
-                if start_index != -1 and end_index != 0:
-                    json_data = llm_output[start_index:end_index]
+                # Use regex to find the JSON block, allowing for ```json or just ```
+                match = re.search(r'```(json)?\s*(\{.*\}|\[.*\])\s*```', llm_output, re.DOTALL)
+                
+                if match:
+                    json_data = match.group(2) # Group 2 captures the content inside the backticks
                     data = json.loads(json_data)
                     # Store the data in the Streamlit session
                     st.session_state.document_text = text
@@ -68,6 +69,7 @@ if upload_file is not None:
                     st.session_state.analysis_complete = True
                 else:
                     st.error("Could not find a valid JSON object in the LLM's response.")
+                    st.code(llm_output, language='text')
                     data = {} # set data to an empty dictionary to avoid errors
             except json.JSONDecodeError as e:
                 st.error(f"Error decoding JSON: {e}")
