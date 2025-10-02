@@ -8,7 +8,7 @@ load_dotenv()
 # This safely gets the key from the environment
 api_key = os.getenv("GOOGLE_API_KEY")
 genai.configure(api_key=api_key)
-model = genai.GenerativeModel("gemini-1.5-flash")
+model = genai.GenerativeModel("gemini-1.5-flash-001")
 
 def extract_entities_with_llm(text):
     full_prompt = f"""You are an expert legal assistant. From the following document provided, you need to perform the following tasks:\
