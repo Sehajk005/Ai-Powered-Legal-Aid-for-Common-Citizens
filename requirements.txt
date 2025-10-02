@@ -9,4 +9,4 @@ pathlib
 PyMuPDF
 google-generativeai
 python-dotenv
-streamlit-gsheetsdb
+st-gsheets-connection

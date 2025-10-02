@@ -15,7 +15,7 @@ import pandas as pd
 from datetime import datetime
 
 # Establish a connection to Google Sheets
-conn = st.connection("gsheets", type="gsheets")
+conn = st.connection("gsheets")
 def log_feedback(question, answer, rating, comment=""):
     # Create a new row of data as a DataFrame
     new_feedback = pd.DataFrame({
