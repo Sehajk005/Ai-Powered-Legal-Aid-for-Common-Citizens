@@ -13,7 +13,7 @@ import re
 import streamlit as st 
 import pandas as pd
 from datetime import datetime
-from st_gsheets_connection import GSheetsConnection
+from streamlit_gsheets import GSheetsConnection
 
 # Establish a connection to Google Sheets
 conn = st.connection("gsheets", type=GSheetsConnection)
