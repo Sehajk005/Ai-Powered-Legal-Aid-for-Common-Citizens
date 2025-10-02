@@ -1,7 +1,23 @@
 import google.generativeai as genai
 import pkg_resources
 
-print("Google Generative AI SDK version:", pkg_resources.get_distribution("google-generativeai").version)
+# Check and log the version of the Google Generative AI SDK
+try:
+    sdk_version = pkg_resources.get_distribution("google-generativeai").version
+    print(f"🔎 Google Generative AI SDK version: {sdk_version}")
+except Exception as e:
+    print("⚠️ Could not detect google-generativeai version:", e)
+
+# List available models (to confirm gemini-1.5-flash exists)
+try:
+    genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+    available_models = genai.list_models()
+    print("📌 Available models:")
+    for m in available_models:
+        print(" -", m.name, "→", m.supported_generation_methods)
+except Exception as e:
+    print("⚠️ Could not list models:", e)
+
 
 import sys
 import os
