@@ -110,6 +110,9 @@ if upload_file is not None:
 if st.session_state.get('analysis_complete'):
     st.subheader("------Analysis Report------\n")
     
+    # Add this line back for debugging
+    st.json(st.session_state.analysis_data)
+    # --- USAGE ---
     report_data = st.session_state.analysis_data
     
     # Define lists of possible keys for each piece of data
@@ -171,7 +174,7 @@ if st.session_state.get('analysis_complete'):
                     --- ORIGINAL DOCUMENT TEXT ---
                     {original_text}
                     --- END OF ORIGINAL DOCUMENT TEXT ---
-                    
+
                     --- DETAILED ANALYSIS OF THE DOCUMENT ---
                     Here is a pre-generated analysis of the document, including extracted entities and clauses with summaries and potential risks:
                     {analysis_summary_str}
