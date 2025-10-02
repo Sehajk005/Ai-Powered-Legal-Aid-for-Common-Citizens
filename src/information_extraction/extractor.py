@@ -37,15 +37,21 @@ def extract_entities_with_llm(text):
     response = model.generate_content(full_prompt)
     return response.text
 
-def answer_user_questions(document_text, user_question):
-    prompt = f"""You are a helpful Q&A chatbot Assistant. Your task is to answer the user question solely based on the provided document \
-        text and not from any other source if the answer to the question is not found in the document text just simply return with \
-        'The answer is not found in the provided document.'. give the answer in simple plain English so that the normal citizen can understand.\
-        -----DOCUMENT TEXT-----\
-            {document_text}\
-        -----END OF DOCUMENT TEXT-----\
-        Based on the document above, answer the following question:\
-        USER QUESTION:{user_question}\
-        ANSWER: """
+def answer_user_questions(full_context, user_question):
+    prompt = f"""You are an expert legal Q&A assistant. Your task is to answer the user's question based on the context provided below.
+    The context contains two parts: the original document text and a detailed JSON analysis of that document which includes summaries and identified potential risks.
+    
+    When answering, synthesize information from BOTH parts. For questions about risks, summaries, or specific clauses, rely heavily on the "DETAILED ANALYSIS" section.
+    
+    Answer in simple, plain English. If the answer cannot be found in the provided context, say "The answer is not found in the provided document."
+
+    ----- CONTEXT -----
+    {full_context}
+    ----- END OF CONTEXT -----
+
+    Based on the context above, answer the following question:
+    USER QUESTION: {user_question}
+    ANSWER: """
     response = model.generate_content(prompt)
     return response.text
+

@@ -158,8 +158,27 @@ if st.session_state.get('analysis_complete'):
         # 3. get the assistant response
         with st.chat_message("assistant"):
             with st.spinner("Thinking..."):
-                doc_text = st.session_state.document_text
-                response = answer_user_questions(doc_text, prompt)
+                # 1. Get the original text from session state
+                original_text = st.session_state.document_text
+
+                # 2. Get the analysis data from session state
+                analysis_data = st.session_state.analysis_data
+                # Convert the analysis dictionary to a nicely formatted string
+                analysis_summary_str = json.dumps(analysis_data, indent=2)
+
+                # 3. Combine them into a single, rich context
+                full_context = f"""
+                    --- ORIGINAL DOCUMENT TEXT ---
+                    {original_text}
+                    --- END OF ORIGINAL DOCUMENT TEXT ---
+                    
+                    --- DETAILED ANALYSIS OF THE DOCUMENT ---
+                    Here is a pre-generated analysis of the document, including extracted entities and clauses with summaries and potential risks:
+                    {analysis_summary_str}
+                    --- END OF DETAILED ANALYSIS ---
+                    """
+                # 4. Pass the new full_context to the Q&A function
+                response = answer_user_questions(full_context, prompt)
                 
                 # 4. add assistant response to chat history
                 st.session_state.message_history.append({"role": "assistant", "content": response})
