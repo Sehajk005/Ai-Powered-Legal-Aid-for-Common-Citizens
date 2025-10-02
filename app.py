@@ -111,7 +111,7 @@ if st.session_state.get('analysis_complete'):
     st.subheader("------Analysis Report------\n")
     
     # Add this line back for debugging
-    st.json(st.session_state.analysis_data)
+    #st.json(st.session_state.analysis_data)
     # --- USAGE ---
     report_data = st.session_state.analysis_data
     
