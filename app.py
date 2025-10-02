@@ -15,6 +15,31 @@ import pandas as pd
 from datetime import datetime
 from streamlit_gsheets import GSheetsConnection
 
+# HELPER FUNCTION FOR ROBUST DATA EXTRACTION
+def find_data(data_dict, key_aliases, default_value=None):
+    """
+    Searches a dictionary for a list of possible keys and returns the value of the first key found.
+    
+    Args:
+        data_dict (dict): The dictionary to search in.
+        key_aliases (list): A list of possible keys to look for (e.g., ['entities', 'extracted_entities']).
+        default_value: The value to return if no keys are found.
+        
+    Returns:
+        The value found or the default value.
+    """
+    if default_value is None:
+        # Infer the default value type from the first alias (dict or list)
+        if any('clauses' in key or 'analysis' in key for key in key_aliases):
+             default_value = []
+        else:
+            default_value = {}
+            
+    for key in key_aliases:
+        if key in data_dict:
+            return data_dict[key]
+    return default_value
+
 # Establish a connection to Google Sheets
 conn = st.connection("gsheets", type=GSheetsConnection)
 def log_feedback(question, answer, rating, comment=""):
@@ -85,34 +110,35 @@ if upload_file is not None:
 if st.session_state.get('analysis_complete'):
     st.subheader("------Analysis Report------\n")
     
-    ###########
-    st.json(st.session_state.analysis_data)
-    ###########
     report_data = st.session_state.analysis_data
-    # Used the safer .get() method in case 'entities' is missing
-    entities_data = report_data.get('entities', {})
-    st.markdown(f"**Individual Names:** {entities_data.get('individuals', 'Not Found')}")
-    st.markdown(f"**Dates:** {entities_data.get('dates', 'Not Found')}")
-    st.markdown(f"**Addresses:** {entities_data.get('addresses', 'Not Found')}")
-    st.markdown(f"**Phone Numbers:** {entities_data.get('phone_numbers', 'Not Found')}")
-    st.markdown(f"**Emails:** {entities_data.get('emails', 'Not Found')}")
-    st.markdown(f"**Company Names:** {entities_data.get('companies', 'Not Found')}")
-    st.markdown(f"**Organization Names:** {entities_data.get('organizations', 'Not Found')}")
     
-    st.subheader(f"Found {len(report_data.get('clauses', []))} clauses:")
+    # Define lists of possible keys for each piece of data
+    entity_key_aliases = ['extracted_entities', 'entities', 'entity_extraction']
+    clause_key_aliases = ['extracted_clauses', 'clauses', 'clause_analysis']
+    
+    # Use the helper function to find the data, regardless of which key the LLM used
+    entities_data = find_data(report_data, entity_key_aliases)
+    clauses_data = find_data(report_data, clause_key_aliases)
+    # --- END OF USAGE ---
 
-    # Used the safer .get() method in case 'clauses' is missing
-    for clause in report_data.get('clauses', []):
-        # Used an expander to keep the UI clean
-        with st.expander(f"**{clause.get('clause_title', 'Untitled Clause')}**"):
+    # Now we display the data found by our robust function
+    st.markdown(f"**Individual Names:** {find_data(entities_data, ['individual_names', 'individuals'], [])}")
+    st.markdown(f"**Dates:** {find_data(entities_data, ['dates'], [])}")
+    st.markdown(f"**Addresses:** {find_data(entities_data, ['addresses_locations', 'addresses_or_locations', 'addresses'], [])}")
+    st.markdown(f"**Phone Numbers:** {find_data(entities_data, ['phone_numbers'], [])}")
+    st.markdown(f"**Emails:** {find_data(entities_data, ['emails'], [])}")
+    st.markdown(f"**Company Names:** {find_data(entities_data, ['company_names', 'companies'], [])}")
+    st.markdown(f"**Organization Names:** {find_data(entities_data, ['organization_names', 'organizations'], [])}")
     
+    st.subheader(f"Found {len(clauses_data)} clauses:")
+
+    for clause in clauses_data:
+        with st.expander(f"**{clause.get('clause_title', 'Untitled Clause')}**"):
             st.markdown(f"""
             - **Clause Type:** *{clause.get('clause_type', 'N/A')}*
-            - **Summary:** {clause.get('summary_in_plain_english', 'N/A')}
-            - **Potential Risks:** {clause.get('potential_risks', 'N/A')}
+            - **Summary:** *{clause.get('summary_in_plain_english', 'N/A')}*
+            - **Potential Risks:** *{clause.get('potential_risks', 'N/A')}*
             """)
-
-            # Write the full clause text
             st.markdown("**Full Clause Text:**")
             st.write(clause.get('clause_text', 'N/A'))
     
