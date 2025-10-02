@@ -11,11 +11,12 @@ import tempfile
 import json
 import re
 import streamlit as st 
+from streamlit_gsheets import GSheetsConnection
 import pandas as pd
 from datetime import datetime
 
 # Establish a connection to Google Sheets
-conn = st.connection("gsheets")
+conn = st.connection("gsheets", type=GSheetsConnection)
 def log_feedback(question, answer, rating, comment=""):
     # Create a new row of data as a DataFrame
     new_feedback = pd.DataFrame({
