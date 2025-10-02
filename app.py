@@ -13,27 +13,30 @@ import re
 import streamlit as st 
 import pandas as pd
 from datetime import datetime
+from st_gsheets_connection import GSheetsConnection
 
 # Establish a connection to Google Sheets
-conn = st.connection("gsheets")
+conn = st.connection("gsheets", type=GSheetsConnection)
 def log_feedback(question, answer, rating, comment=""):
     
-    existing_feedback = conn.read(worksheet="Feedback", ttl=0)
+    existing_feedback = conn.read(worksheet="Feedback", usecols=list(range(5)), ttl=0)
     
     # Create a new row of data as a DataFrame
-    new_feedback = pd.DataFrame({
-        "timestamp": [datetime.now()],
-        "question": [question],
-        "answer": [answer],
-        "rating": [rating],
-        "comment": [comment]
-    })
-    # Concatenate the new feedback to the existing data.
+    new_feedback = pd.DataFrame(
+        [
+            {
+                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "question": question,
+                "answer": answer,
+                "rating": rating,
+                "comment": comment,
+            }
+        ]
+    )
+    ## Append the new feedback to the existing data
     updated_feedback = pd.concat([existing_feedback, new_feedback], ignore_index=True)
     
-    # Write the entire updated DataFrame back to the sheet.
-    # The 'clear' and 'update' combination is a robust way to append.
-    conn.clear(worksheet="Feedback")
+    # Update the worksheet with the new combined data
     conn.update(worksheet="Feedback", data=updated_feedback)
     
 
