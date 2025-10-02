@@ -14,11 +14,12 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 
-
-SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/14pEVaM0ixp0TNgU5FnLgbnVtbIXAXy0VFvbAdyRIcE8/edit?gid=0#gid=0"
 # Establish a connection to Google Sheets
 conn = st.connection("gsheets")
 def log_feedback(question, answer, rating, comment=""):
+    
+    existing_feedback = conn.read(worksheet="Feedback", ttl=0)
+    
     # Create a new row of data as a DataFrame
     new_feedback = pd.DataFrame({
         "timestamp": [datetime.now()],
@@ -27,12 +28,13 @@ def log_feedback(question, answer, rating, comment=""):
         "rating": [rating],
         "comment": [comment]
     })
-    # Append the new row to the Google Sheet
-    conn.update(
-        spreadsheet=SPREADSHEET_URL,
-        worksheet="Feedback",
-        data=new_feedback
-    )
+    # Concatenate the new feedback to the existing data.
+    updated_feedback = pd.concat([existing_feedback, new_feedback], ignore_index=True)
+    
+    # Write the entire updated DataFrame back to the sheet.
+    # The 'clear' and 'update' combination is a robust way to append.
+    conn.clear(worksheet="Feedback")
+    conn.update(worksheet="Feedback", data=updated_feedback)
     
 
 if 'message_history' not in st.session_state:
