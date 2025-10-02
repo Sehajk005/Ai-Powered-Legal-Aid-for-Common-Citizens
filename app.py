@@ -1,3 +1,8 @@
+import google.generativeai as genai
+import pkg_resources
+
+print("Google Generative AI SDK version:", pkg_resources.get_distribution("google-generativeai").version)
+
 import sys
 import os
 
