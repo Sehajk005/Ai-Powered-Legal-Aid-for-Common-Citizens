@@ -32,7 +32,7 @@ def log_feedback(question, answer, rating, comment=""):
 if 'message_history' not in st.session_state:
     st.session_state.message_history = []
     
-st.title("AI Powered Legial Aid For Common Citizens")
+st.title("AI Powered Legal Aid For Common Citizens")
 upload_file = st.file_uploader("Upload a PDF", type=['pdf'])
 if upload_file is not None:
     if st.button("Analyze Document", type="primary"):
@@ -112,22 +112,26 @@ if st.session_state.get('analysis_complete'):
             with st.spinner("Thinking..."):
                 doc_text = st.session_state.document_text
                 response = answer_user_questions(doc_text, prompt)
+                
+                # 4. add assistant response to chat history
+                st.session_state.message_history.append({"role": "assistant", "content": response})
+                # 5. Display assistant response in chat
                 st.markdown(response)
                 
                 # create colunm for feedback button
                 col1, col2, col3 = st.columns([1, 1, 8])
                 current_key_base = len(st.session_state.message_history)
-                
+
                 with col1:
                     if st.button("👍", key=f"good_{current_key_base}"):
                         log_feedback(question=prompt, answer=response, rating="good")
                         st.toast("Thanks for your feedback!")
-                
+
                 with col2:
                     if st.button("👎", key=f"bad_{current_key_base}"):
                         # Set a flag in session state to show the comment box
                         st.session_state[f"show_comment_for_{current_key_base}"] = True
-                
+
                 # Conditionally show a text area and submit button for comments
                 if st.session_state.get(f"show_comment_for_{current_key_base}"):
                     comment = st.text_area(
@@ -141,6 +145,4 @@ if st.session_state.get('analysis_complete'):
                         st.session_state[f"show_comment_for_{current_key_base}"] = False
                         st.rerun() # Rerun to reflect the change immediately
                 
-            # 4. add assistant response to chat history
-            st.session_state.message_history.append({"role": "assistant", "content": response})
         
