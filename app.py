@@ -85,6 +85,9 @@ if upload_file is not None:
 if st.session_state.get('analysis_complete'):
     st.subheader("------Analysis Report------\n")
     
+    ###########
+    st.json(st.session_state.analysis_data)
+    ###########
     report_data = st.session_state.analysis_data
     # Used the safer .get() method in case 'entities' is missing
     entities_data = report_data.get('entities', {})
