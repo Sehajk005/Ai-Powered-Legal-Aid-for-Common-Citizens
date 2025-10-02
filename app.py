@@ -11,12 +11,13 @@ import tempfile
 import json
 import re
 import streamlit as st 
-from streamlit_gsheets import GSheetsConnection
 import pandas as pd
 from datetime import datetime
 
+
+SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/14pEVaM0ixp0TNgU5FnLgbnVtbIXAXy0VFvbAdyRIcE8/edit?gid=0#gid=0"
 # Establish a connection to Google Sheets
-conn = st.connection("gsheets", type=GSheetsConnection)
+conn = st.connection("gsheets")
 def log_feedback(question, answer, rating, comment=""):
     # Create a new row of data as a DataFrame
     new_feedback = pd.DataFrame({
@@ -27,7 +28,11 @@ def log_feedback(question, answer, rating, comment=""):
         "comment": [comment]
     })
     # Append the new row to the Google Sheet
-    conn.update(worksheet="Feedback", data=new_feedback)
+    conn.update(
+        spreadsheet=SPREADSHEET_URL,
+        worksheet="Feedback",
+        data=new_feedback
+    )
     
 
 if 'message_history' not in st.session_state:
