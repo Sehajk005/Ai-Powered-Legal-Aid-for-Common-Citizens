@@ -111,7 +111,7 @@ if st.session_state.get('analysis_complete'):
     st.subheader("------Analysis Report------\n")
     
     # Add this line back for debugging
-    # st.json(st.session_state.analysis_data)
+    st.json(st.session_state.analysis_data)
     # --- USAGE ---
     report_data = st.session_state.analysis_data
     
@@ -151,14 +151,14 @@ if st.session_state.get('analysis_complete'):
     for index, message in enumerate(st.session_state.message_history):
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
-            
+
             # Add feedback buttons ONLY to assistant messages
             if message["role"] == "assistant":
                 # Find the user question that corresponds to this answer
                 question_for_feedback = ""
                 if index > 0 and st.session_state.message_history[index - 1]["role"] == "user":
                     question_for_feedback = st.session_state.message_history[index - 1]["content"]
-    
+
                 col1, col2, _ = st.columns([1, 1, 8])
                 with col1:
                     if st.button("👍", key=f"good_{index}"):
@@ -168,13 +168,13 @@ if st.session_state.get('analysis_complete'):
                         except Exception as e:
                             st.error("An error occurred while logging feedback:")
                             st.exception(e)
-                
+
                 with col2:
                     if st.button("👎", key=f"bad_{index}"):
                         # You can add the detailed feedback logic here if needed
                         st.session_state[f"show_comment_for_{index}"] = True
-    
-    
+
+
                 # Logic for the detailed feedback text area
                 if st.session_state.get(f"show_comment_for_{index}"):
                     comment = st.text_area(
@@ -190,16 +190,16 @@ if st.session_state.get('analysis_complete'):
                         except Exception as e:
                             st.error("An error occurred while logging feedback:")
                             st.exception(e)
-    
+
     # 2. Get new user input
     if prompt := st.chat_input("Ask a question"):
         # Add user message to history
         st.session_state.message_history.append({"role": "user", "content": prompt})
-    
+
         # Display user message
         with st.chat_message("user"):
             st.markdown(prompt)
-    
+
         # Generate and display assistant response
         with st.chat_message("assistant"):
             with st.spinner("Thinking..."):
@@ -208,9 +208,9 @@ if st.session_state.get('analysis_complete'):
                 analysis_data = st.session_state.analysis_data
                 analysis_summary_str = json.dumps(analysis_data, indent=2)
                 full_context = f"""--- ORIGINAL DOCUMENT TEXT ---\n{original_text}\n--- END OF ORIGINAL DOCUMENT TEXT ---\n\n--- DETAILED ANALYSIS OF THE DOCUMENT ---\n{analysis_summary_str}\n--- END OF DETAILED ANALYSIS ---"""
-                
+
                 response = answer_user_questions(full_context, prompt)
-                
+
                 # Add assistant response to history
                 st.session_state.message_history.append({"role": "assistant", "content": response})
                 # This will be displayed in the next rerun
