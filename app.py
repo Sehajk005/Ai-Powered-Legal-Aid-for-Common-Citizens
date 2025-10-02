@@ -162,20 +162,14 @@ if st.session_state.get('analysis_complete'):
                 col1, col2, _ = st.columns([1, 1, 8])
                 with col1:
                     if st.button("👍", key=f"good_{index}"):
-                        try:
-                            log_feedback(question=question_for_feedback, answer=message["content"], rating="good")
-                            st.toast("Thanks for your feedback!")
-                        except Exception as e:
-                            st.error("An error occurred while logging feedback:")
-                            st.exception(e)
+                        st.session_state[f"show_comment_for_{index}"] = True
+                        st.session_state[f"rating_for_{index}"] = "good"
 
                 with col2:
                     if st.button("👎", key=f"bad_{index}"):
-                        # You can add the detailed feedback logic here if needed
                         st.session_state[f"show_comment_for_{index}"] = True
+                        st.session_state[f"rating_for_{index}"] = "bad"
 
-
-                # Logic for the detailed feedback text area
                 if st.session_state.get(f"show_comment_for_{index}"):
                     comment = st.text_area(
                         "Please provide more details:", 
@@ -183,7 +177,8 @@ if st.session_state.get('analysis_complete'):
                     )
                     if st.button("Submit Feedback", key=f"submit_{index}"):
                         try:
-                            log_feedback(question=question_for_feedback, answer=message["content"], rating="bad", comment=comment)
+                            rating = st.session_state.get(f"rating_for_{index}", "bad")
+                            log_feedback(question=question_for_feedback, answer=message["content"], rating=rating, comment=comment)
                             st.toast("Thanks for your detailed feedback!")
                             st.session_state[f"show_comment_for_{index}"] = False
                             st.rerun()
