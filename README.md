@@ -1,12 +1,12 @@
 # AI-Powered Legal Aid for Common Citizens
 
-## 📋 Overview
+## Overview
 
 **AI-Powered Legal Aid for Common Citizens** is a Streamlit-based application that leverages advanced AI and natural language processing to help everyday users understand complex legal documents. The app extracts key information, translates legal jargon into plain English, and provides intelligent clause-by-clause analysis with risk assessments. It also features an integrated chatbot for document-specific Q&A and a feedback mechanism to support research in Responsible AI and LLM Alignment.
 
 ---
 
-## ✨ Features
+## Features
 
 - **PDF Document Upload**: Upload legal documents in PDF format for analysis
 - **Entity Extraction**: Automatically identifies names, dates, addresses, organizations, and other key entities
@@ -17,7 +17,7 @@
 
 ---
 
-## 🎯 Research Purpose
+## Research Purpose
 
 This project serves a dual purpose:
 
@@ -28,7 +28,7 @@ This project serves a dual purpose:
 
 ---
 
-## 🚀 How to Use
+## How to Use
 
 1. **Upload** your legal PDF document
 2. **Review** extracted entities, dates, names, and organizations
@@ -38,7 +38,7 @@ This project serves a dual purpose:
 
 ---
 
-## 📊 Data Collection & Ethics
+## Data Collection & Ethics
 
 ### What We Collect
 - User questions and AI responses
@@ -56,11 +56,11 @@ This project serves a dual purpose:
 - You may request data removal at any time
 - Participation is voluntary and can be withdrawn
 
-**Contact for data removal**: [Your Email Address]
+**Contact for data removal**: sehajk2048@gmail.com
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 - **Frontend**: Streamlit
 - **LLM/NLP**: Google Gemini 1.5 Flash API
@@ -71,7 +71,7 @@ This project serves a dual purpose:
 
 ---
 
-## 💻 Installation & Setup
+## Installation & Setup
 
 ### Prerequisites
 - Python 3.8+
@@ -82,8 +82,7 @@ This project serves a dual purpose:
 
 ```bash
 # Clone the repository
-git clone https://github.com/[your-username]/ai-legal-aid.git
-cd ai-legal-aid
+git clone https://github.com/Sehajk005/Ai-Powered-Legal-Aid-for-Common-Citizens.git
 
 # Install dependencies
 pip install -r requirements.txt
@@ -123,11 +122,11 @@ streamlit run app.py
 
 ---
 
-## 🌐 Deployment
+## Deployment
 
 This app is deployed on Streamlit Community Cloud:
 
-**Live App**: [Your Streamlit App URL]
+**Live App**: http://ai-powered-legal-aid-for-common-citizens.streamlit.app/
 
 To deploy your own version:
 1. Fork this repository
@@ -142,13 +141,13 @@ To deploy your own version:
 We encourage users to participate in our research by:
 
 - **Using the app** and providing ratings/comments on AI responses
-- **Filling out our survey**: [Google Forms Survey Link]
+- **Filling out our survey**: https://docs.google.com/forms/d/e/1FAIpQLSfbnCaBoyoMc7Ui0IUkliSQRckk2ZlmRDRkukNLczoClEqbTw/viewform?usp=header
 - **Reporting bugs** via GitHub Issues
 - **Contributing code** via Pull Requests
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Here's how you can help:
 
@@ -162,7 +161,7 @@ Please ensure your code follows best practices for Responsible AI and includes a
 
 ---
 
-## 📚 Documentation
+## Documentation
 
 For more details on the project structure and implementation:
 
@@ -172,44 +171,44 @@ For more details on the project structure and implementation:
 
 ---
 
-## 📖 Citation
+## Citation
 
 If you use this work in your research, please cite:
 
 ```bibtex
 @misc{legalAidAI2025,
   title={AI-Powered Legal Aid for Common Citizens},
-  author={[Your Name]},
+  author={Sehaj Khurana},
   year={2025},
-  howpublished={\url{https://github.com/[your-username]/ai-legal-aid}},
+  howpublished={\url{https://github.com/Sehajk005/Ai-Powered-Legal-Aid-for-Common-Citizens.git}},
   note={A Responsible AI research project for LLM alignment in legal domain}
 }
 ```
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## ⚠️ Disclaimer
+## Disclaimer
 
 **This application is for educational and research purposes only. It does NOT constitute legal advice. For actual legal matters, please consult a qualified attorney.**
 
 ---
 
-## 👤 Contact
+## Contact
 
-**[Your Name]**
-- Email: [your.email@example.com]
-- LinkedIn: [Your LinkedIn Profile]
-- GitHub: [@your-username](https://github.com/your-username)
+**Sehaj Khurana**
+- Email: sehajk2048@gmail.com
+- LinkedIn: www.linkedin.com/in/sehaj-khurana-8b0200359
+- GitHub: [@Sehajk005](https://github.com/Sehajk005)
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Thanks to all beta testers and feedback contributors
 - Google Gemini API for powering the AI capabilities
@@ -218,7 +217,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## 🗺️ Roadmap
+## Roadmap
 
 - [ ] Multi-language support
 - [ ] Fine-tuning on legal domain data
